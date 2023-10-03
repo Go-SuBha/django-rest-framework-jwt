@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 from rest_framework.settings import APISettings
-
+import os
 
 USER_SETTINGS = getattr(settings, 'JWT_AUTH', None)
 
@@ -60,3 +60,15 @@ IMPORT_STRINGS = (
 )
 
 api_settings = APISettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS)
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('DATABASE_ENGINE', 'django.db.backends.mysql'),
+        'NAME': os.environ.get('DATABASE_NAME', 'genome'),
+        'USER': os.environ.get('DATABASE_USER', 'swiadmin'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'jr!9tkMuXT9ui'),
+        'HOST': os.environ.get('DATABASE_HOST', '164.52.192.27'),
+        'PORT': os.environ.get('DATABASE_PORT', '3306'), 
+    }
+}

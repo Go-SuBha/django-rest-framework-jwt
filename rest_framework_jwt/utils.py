@@ -10,7 +10,7 @@ from datetime import datetime
 from rest_framework_jwt.compat import get_username
 from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
-
+from .models import Profile
 
 def jwt_get_secret_key(payload=None):
     """
@@ -32,6 +32,8 @@ def jwt_get_secret_key(payload=None):
 def jwt_payload_handler(user):
     username_field = get_username_field()
     username = get_username(user)
+    org_id = Profile.objects.filter(user=user).values_list('org_id', flat=True).first()
+    short_name = Profile.objects.filter(user=user).values_list('short_name', flat=True).first()
 
     warnings.warn(
         'The following fields will be removed in the future: '
@@ -42,6 +44,8 @@ def jwt_payload_handler(user):
     payload = {
         'user_id': user.pk,
         'username': username,
+        "org_id": org_id,
+        "short_name": short_name,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA
     }
     if hasattr(user, 'email'):
@@ -115,7 +119,7 @@ def jwt_decode_handler(token):
     )
 
 
-def jwt_response_payload_handler(token, user=None, request=None):
+def jwt_response_payload_handler(token, user=None, request=None, org_id=None, user_id=None):
     """
     Returns the response data for both the login and refresh views.
     Override to return a custom response such as including the
@@ -131,5 +135,5 @@ def jwt_response_payload_handler(token, user=None, request=None):
 
     """
     return {
-        'token': token
+        'token': token, 'short_name': user, 'org_id': org_id, 'user_id': user_id, 'is_superuser': is_superuser,
     }

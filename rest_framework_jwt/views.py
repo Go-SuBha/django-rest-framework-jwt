@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime
-
+from .models import Profile
 from .settings import api_settings
 from .serializers import (
     JSONWebTokenSerializer, RefreshJSONWebTokenSerializer,
@@ -57,7 +57,10 @@ class JSONWebTokenAPIView(APIView):
         if serializer.is_valid():
             user = serializer.object.get('user') or request.user
             token = serializer.object.get('token')
-            response_data = jwt_response_payload_handler(token, user, request)
+            short_name = Profile.objects.filter(user=user).values_list('short_name', flat=True).first()
+            org_id = Profile.objects.filter(user=user).values_list('org_id', flat=True).first()
+            user_id = Profile.objects.filter(user=user).values_list('user_id', flat=True).first()
+            response_data = jwt_response_payload_handler(token, short_name, request, org_id, user_id,user.is_superuser)
             response = Response(response_data)
             if api_settings.JWT_AUTH_COOKIE:
                 expiration = (datetime.utcnow() +
