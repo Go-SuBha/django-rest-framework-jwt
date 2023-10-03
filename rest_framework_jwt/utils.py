@@ -10,7 +10,7 @@ from datetime import datetime
 from rest_framework_jwt.compat import get_username
 from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
-from .models import Profile
+from users.models import Profile
 
 def jwt_get_secret_key(payload=None):
     """
